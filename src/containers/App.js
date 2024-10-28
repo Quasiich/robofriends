@@ -1,46 +1,37 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import CardList from "../components/CardList";
 import SearchBox from "../components/SearchBox";
 import Scroll from "../components/Scroll";
 import ErrorBoundry from "../components/ErrorBoundry";
 import '../../src/containers/app.css'
 
-class App extends Component {
-   constructor() {
-      super()
-      this.state = {
-         robots: [],
-         searchfield: "",
-      }
-   }
+function App () {
+   const [robots, setRobots] = useState([])
+   const [searchfield, setSearchfield] = useState('')
 
-   componentDidMount() {
+   useEffect(() => {
       fetch('https://jsonplaceholder.typicode.com/users')
          .then(res => res.json())
-         .then(user => this.setState({ robots: user }));
-   }
+         .then(user => setRobots( user ));
+   },[searchfield])
 
-   onSearchChange = (event) => {
-      this.setState({ searchfield: event.target.value })
+   const onSearchChange = (event) => {
+      setSearchfield(event.target.value)
    }
-
-   render() {
-      const { robots, searchfield } = this.state;
-      const filteredRobots = robots.filter(robot => {
-         return robot.name.toLowerCase().includes(searchfield.toLowerCase())
+   const filteredRobots = robots.filter(robot => {
+      return robot.name.toLowerCase().includes(searchfield.toLowerCase())
       })
-      return (
-         <div className="tc">
-            <h1 className="f1">RoboFriends</h1>
-            <SearchBox searchChange={this.onSearchChange}/>
-            <Scroll>
-               <ErrorBoundry>
-                <CardList robots={filteredRobots} />
-               </ErrorBoundry>
-            </Scroll>
-         </div>
-      );
-   }
+   return (
+      <div className="tc">
+         <h1 className="f1">RoboFriends</h1>
+         <SearchBox searchChange={onSearchChange}/>
+         <Scroll>
+            <ErrorBoundry>
+               <CardList robots={filteredRobots} />
+            </ErrorBoundry>
+         </Scroll>
+      </div>
+   );
 }
 
 export default App;
